@@ -2,8 +2,8 @@
 FROM python:3.10-slim
 
 # Prevent Python from writing .pyc files
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 # --- Install OS Packages ---
 RUN apt-get update && apt-get install -y \
@@ -28,4 +28,5 @@ COPY . .
 EXPOSE 8000
 
 # --- Launch App ---
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Use Railway's PORT env var if present, otherwise default to 8000
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
