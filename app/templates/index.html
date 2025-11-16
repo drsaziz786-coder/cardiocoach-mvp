@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CardioCoach – Understand Your Discharge Summary</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="header">
+      <div class="logo">CardioCoach<span class="logo-dot">AI</span></div>
+      <p class="tagline">
+        Paste your hospital discharge summary and get a clear explanation,
+        designed by a UK cardiologist.
+      </p>
+    </header>
+
+    <main class="main">
+      <section class="card">
+        <h2 class="card-title">1. Paste your discharge summary</h2>
+        <p class="card-help">
+          You can remove your name or personal details if you prefer.
+          CardioCoach does not store any uploaded text.
+        </p>
+<form id="discharge-form">
+  <textarea id="discharge-text" class="textarea" rows="10"
+    placeholder="Paste your discharge letter here..."></textarea>
+
+  <div class="upload-row">
+    <label for="pdf-input" class="upload-label">
+      Or upload your discharge letter as a PDF:
+    </label>
+    <input type="file" id="pdf-input" accept="application/pdf" />
+  </div>
+
+  <div class="button-row">
+    <button type="submit" class="btn-primary" id="submit-btn">
+      Explain pasted text
+    </button>
+    <button type="button" class="btn-secondary" id="pdf-btn">
+      Explain PDF discharge letter
+    </button>
+  </div>
+
+  <p id="status" class="status"></p>
+</form>      </section>
+
+      <section class="results-grid">
+        <div class="card" id="summary-card">
+          <h2 class="card-title">2. Key information from your letter</h2>
+          <div id="extraction">
+            <p class="muted">Your summary will appear here.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">3. Safety checks</h2>
+          <p class="card-help">
+            Automated checks for medication issues or missing follow-up.
+          </p>
+          <div id="alerts">
+            <p class="muted">Any alerts will appear here.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p class="footer-text">
+        CardioCoach is an educational tool and does not replace medical advice.
+        Always follow the plan from your own medical team.
+      </p>
+    </footer>
+  </div>
+
+  <script>
+    const form = document.getElementById("discharge-form");
+    const textarea = document.getElementById("discharge-text");
+    const statusEl = document.getElementById("status");
+    const extractionEl = document.getElementById("extraction");
+    const alertsEl = document.getElementById("alerts");
+    const submitBtn = document.getElementById("submit-btn");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const text = textarea.value.trim();
+      if (!text) {
+        statusEl.textContent = "Please paste your discharge letter first.";
+        statusEl.className = "status status-error";
+        return;
+      }
+
+      statusEl.textContent = "Processing your letter…";
+      statusEl.className = "status status-info";
+      submitBtn.disabled = true;
+
+      try {
+        const response = await fetch("/process", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+          },
+          body: JSON.stringify({ text }),
+        });
+
+        if (!response.ok) throw new Error("Server error " + response.status);
+
+        const data = await response.json();
+        renderExtraction(data.extraction);
+        renderAlerts(data.alerts);
+
+        statusEl.textContent = "Done.";
+        statusEl.className = "status status-success";
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = "Something went wrong. Try again.";
+        statusEl.className = "status status-error";
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+
+    function renderExtraction(extraction) {
+      extractionEl.innerHTML = `
+        ${renderList("Diagnoses", extraction.diagnoses)}
+        ${renderList("Procedures", extraction.procedures)}
+        ${renderMedChanges(extraction.medication_changes)}
+        ${renderFollowUp(extraction.follow_up)}
+        ${renderList("Pending tests", extraction.pending_tests)}
+        ${renderList("Safety advice in the letter", extraction.red_flags)}
+      `;
+    }
+
+    function renderList(title, items) {
+      if (!items || items.length === 0) {
+        return `<div class="result-block">
+          <h3>${title}</h3>
+          <p class="muted">None mentioned.</p>
+        </div>`;
+      }
+      return `<div class="result-block">
+        <h3>${title}</h3>
+        <ul class="pill-list">
+          ${items.map(i => `<li>${escapeHtml(i)}</li>`).join("")}
+        </ul>
+      </div>`;
+    }
+
+    function renderMedChanges(changes) {
+      if (!changes || changes.length === 0) {
+        return `<div class="result-block">
+          <h3>Medication changes</h3>
+          <p class="muted">None identified.</p>
+        </div>`;
+      }
+      return `<div class="result-block">
+        <h3>Medication changes</h3>
+        <ul class="bullet-list">
+          ${changes.map(m => `
+            <li><strong>${escapeHtml(m.action.toUpperCase())}</strong> — 
+              ${escapeHtml(m.name)} ${m.dose ? "(" + escapeHtml(m.dose) + ")" : ""}</li>
+          `).join("")}
+        </ul>
+      </div>`;
+    }
+
+    function renderFollowUp(fu) {
+      if (!fu || fu.length === 0) {
+        return `<div class="result-block">
+          <h3>Follow-up</h3>
+          <p class="muted">No follow-up plan found.</p>
+        </div>`;
+      }
+      return `<div class="result-block">
+        <h3>Follow-up</h3>
+        <ul class="bullet-list">
+          ${fu.map(f => `
+            <li>${escapeHtml(f.type)} — ${escapeHtml(f.when)}
+              ${f.location ? "(" + escapeHtml(f.location) + ")" : ""}</li>
+          `).join("")}
+        </ul>
+      </div>`;
+    }
+
+    function renderAlerts(alerts) {
+      if (!alerts || alerts.length === 0) {
+        alertsEl.innerHTML = `<p class="muted">No safety alerts.</p>`;
+        return;
+      }
+      alertsEl.innerHTML = alerts.map(alert => {
+        const severityClass =
+          alert.severity === "critical" ? "alert-critical" :
+          alert.severity === "warning" ? "alert-warning" : "alert-info";
+        return `<div class="alert ${severityClass}">
+          <p class="alert-message">${escapeHtml(alert.message)}</p>
+          ${alert.suggested_question ?
+            `<p class="alert-question">Ask your GP: “${escapeHtml(alert.suggested_question)}”</p>` : ""}
+        </div>`;
+      }).join("");
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>

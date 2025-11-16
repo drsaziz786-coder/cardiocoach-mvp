@@ -7,3 +7,6 @@ pypdf
 reportlab
 pdfminer.six
 openai
+jinja2
+pypdf
+python-multipart

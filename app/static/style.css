@@ -1,0 +1,246 @@
+:root {
+  --bg: #0f172a;
+  --bg-card: #0b1220;
+  --bg-card-soft: #020617;
+  --border-subtle: #1e293b;
+  --accent: #22c55e;
+  --accent-soft: rgba(34, 197, 94, 0.12);
+  --accent-strong: #16a34a;
+  --text-main: #e5e7eb;
+  --text-muted: #94a3b8;
+  --danger: #ef4444;
+  --danger-soft: rgba(239, 68, 68, 0.15);
+  --warning: #f59e0b;
+  --warning-soft: rgba(245, 158, 11, 0.18);
+  --info: #38bdf8;
+  --info-soft: rgba(56, 189, 248, 0.15);
+
+  --radius-card: 18px;
+  --shadow-soft: 0 18px 40px rgba(15, 23, 42, 0.75);
+}
+
+/* Reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "SF Pro", sans-serif;
+  background: radial-gradient(circle at top, #1f2937 0, #020617 60%, #020617 100%);
+  color: var(--text-main);
+}
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.header {
+  padding: 1.5rem 1.25rem 0.6rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.logo {
+  font-size: 1.7rem;
+  font-weight: 700;
+}
+
+.logo-dot {
+  background: var(--accent-soft);
+  color: var(--accent);
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  margin-left: 0.2rem;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.tagline {
+  margin: 0.5rem 0 0;
+  max-width: 500px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+/* Main layout */
+.main {
+  flex: 1;
+  padding: 1rem 1.25rem 2rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* Cards */
+.card {
+  background: radial-gradient(circle at top left, #111827 0, #020617 50%);
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border-subtle);
+  padding: 1.25rem 1.4rem;
+  box-shadow: var(--shadow-soft);
+  margin-bottom: 1.2rem;
+}
+
+.card-title {
+  margin: 0 0 0.5rem;
+}
+
+.card-help {
+  margin: 0 0 0.7rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* Text input */
+.textarea {
+  width: 100%;
+  border-radius: 14px;
+  border: 1px solid #1f2937;
+  background: #020617;
+  padding: 0.85rem;
+  color: var(--text-main);
+  font-size: 0.9rem;
+  resize: vertical;
+  margin-bottom: 0.75rem;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.5);
+}
+
+/* Button */
+.btn-primary {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent-strong), #4ade80);
+  border: none;
+  cursor: pointer;
+  color: #022c22;
+  box-shadow: 0 10px 25px rgba(34, 197, 94, 0.35);
+  transition: all 0.15s ease;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.03);
+  transform: translateY(-2px);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Status messages */
+.status {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.status-info {
+  color: var(--info);
+}
+.status-success {
+  color: var(--accent);
+}
+.status-error {
+  color: var(--danger);
+}
+
+/* Results grid */
+.results-grid {
+  display: grid;
+  gap: 1.3rem;
+}
+
+@media (min-width: 900px) {
+  .results-grid {
+    grid-template-columns: 1.5fr 1fr;
+  }
+}
+
+/* Result blocks */
+.result-block {
+  margin-bottom: 1rem;
+}
+
+.result-block h3 {
+  margin: 0 0 0.4rem;
+}
+
+.pill-list,
+.bullet-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pill-list li {
+  display: inline-block;
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 0 0.35rem 0.35rem 0;
+  font-size: 0.82rem;
+}
+
+.bullet-list li {
+  position: relative;
+  padding-left: 1rem;
+  margin-bottom: 0.3rem;
+}
+.bullet-list li::before {
+  content: "•";
+  position: absolute;
+  left: 0.2rem;
+  color: var(--accent);
+}
+
+/* Alerts */
+.alert {
+  padding: 0.75rem;
+  border-radius: 12px;
+  margin-bottom: 0.7rem;
+  font-size: 0.9rem;
+}
+
+.alert-critical {
+  background: var(--danger-soft);
+  border: 1px solid var(--danger);
+}
+
+.alert-warning {
+  background: var(--warning-soft);
+  border: 1px solid var(--warning);
+}
+
+.alert-info {
+  background: var(--info-soft);
+  border: 1px solid var(--info);
+}
+
+.alert-message {
+  margin-bottom: 0.25rem;
+}
+
+.alert-question {
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* Footer */
+.footer {
+  padding: 1.2rem;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  text-align: left;
+}

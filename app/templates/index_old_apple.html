@@ -1,0 +1,250 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2487.7">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="en"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta charset="UTF-8" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;CardioCoach – Understand Your Discharge Summary&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;link rel="stylesheet" href="/static/style.css" /&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="page"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Header --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;header class="header"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="logo"&gt;CardioCoach&lt;span class="logo-dot"&gt;AI&lt;/span&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;p class="tagline"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>Paste your hospital discharge summary and get a clear explanation,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>designed by a UK cardiologist.</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/header&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Main Content --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;main class="main"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;!-- Input Card --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;section class="card"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h2 class="card-title"&gt;1. Paste your discharge summary&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;p class="card-help"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>You can remove your name or personal details if you prefer.</p>
+<p class="p1"><span class="Apple-converted-space">          </span>CardioCoach does not store any uploaded text.</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/p&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;form id="discharge-form"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;textarea id="discharge-text" class="textarea" rows="10"</p>
+<p class="p1"><span class="Apple-converted-space">            </span>placeholder="Paste your discharge letter here..."&gt;&lt;/textarea&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;button type="submit" class="btn-primary" id="submit-btn"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>Explain my discharge letter</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/button&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;p id="status" class="status"&gt;&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/form&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/section&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;!-- Results Grid --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;section class="results-grid"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- Left column: Extraction summary --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="card" id="summary-card"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;h2 class="card-title"&gt;2. Key information from your letter&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div id="extraction"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;p class="muted"&gt;Your summary will appear here.&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- Right column: Alerts --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="card"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;h2 class="card-title"&gt;3. Safety checks&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;p class="card-help"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>Automated checks for medication issues or missing follow-up.</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div id="alerts"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;p class="muted"&gt;Any alerts will appear here.&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/section&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/main&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Footer --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;footer class="footer"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;p class="footer-text"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>CardioCoach is an educational tool and does not replace medical advice.</p>
+<p class="p1"><span class="Apple-converted-space">        </span>Always follow the plan from your own medical team.</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/footer&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;!-- JavaScript to call the backend --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const form = document.getElementById("discharge-form");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const textarea = document.getElementById("discharge-text");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const statusEl = document.getElementById("status");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const extractionEl = document.getElementById("extraction");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const alertsEl = document.getElementById("alerts");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const submitBtn = document.getElementById("submit-btn");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>form.addEventListener("submit", async (e) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>e.preventDefault();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const text = textarea.value.trim();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (!text) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>statusEl.textContent = "Please paste your discharge letter first.";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>statusEl.className = "status status-error";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>statusEl.textContent = "Processing your letter…";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>statusEl.className = "status status-info";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>submitBtn.disabled = true;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const response = await fetch("/process", {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>method: "POST",</p>
+<p class="p1"><span class="Apple-converted-space">          </span>headers: {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"Content-Type": "application/json",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"Accept": "application/json",</p>
+<p class="p1"><span class="Apple-converted-space">          </span>},</p>
+<p class="p1"><span class="Apple-converted-space">          </span>body: JSON.stringify({ text }),</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (!response.ok) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>throw new Error("Error from server: " + response.status);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const data = await response.json();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>renderExtraction(data.extraction);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>renderAlerts(data.alerts);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>statusEl.textContent = "Done.";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>statusEl.className = "status status-success";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>} catch (err) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>console.error(err);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>statusEl.textContent = "Something went wrong. Try again.";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>statusEl.className = "status status-error";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>} finally {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>submitBtn.disabled = false;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function renderExtraction(extraction) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>extractionEl.innerHTML = `</p>
+<p class="p1"><span class="Apple-converted-space">        </span>${renderList("Diagnoses", extraction.diagnoses)}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>${renderList("Procedures", extraction.procedures)}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>${renderMedChanges(extraction.medication_changes)}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>${renderFollowUp(extraction.follow_up)}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>${renderList("Pending tests", extraction.pending_tests)}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>${renderList("Safety symptoms in the letter", extraction.red_flags)}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function renderList(title, items) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (!items || items.length === 0) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return `</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="result-block"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;h3&gt;${title}&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;p class="muted"&gt;None mentioned.&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>return `</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="result-block"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;h3&gt;${title}&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;ul class="pill-list"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>${items.map(i =&gt; `&lt;li&gt;${escape(i)}&lt;/li&gt;`).join("")}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/ul&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function renderMedChanges(changes) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (!changes || changes.length === 0) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return `</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="result-block"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;h3&gt;Medication changes&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;p class="muted"&gt;None identified.&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>return `</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="result-block"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;h3&gt;Medication changes&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;ul class="bullet-list"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>${changes.map(m =&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>`&lt;li&gt;&lt;strong&gt;${escape(m.action.toUpperCase())}&lt;/strong&gt; — ${escape(m.name)} ${m.dose ? "(" + escape(m.dose) + ")" : ""}&lt;/li&gt;`</p>
+<p class="p1"><span class="Apple-converted-space">            </span>).join("")}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/ul&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function renderFollowUp(fu) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (!fu || fu.length === 0) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return `</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="result-block"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;h3&gt;Follow-up&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;p class="muted"&gt;No follow-up plan found.&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>return `</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="result-block"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;h3&gt;Follow-up&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;ul class="bullet-list"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>${fu.map(f =&gt; `&lt;li&gt;${escape(f.type)} — ${escape(f.when)} ${f.location ? "(" + escape(f.location) + ")" : ""}&lt;/li&gt;`).join("")}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/ul&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function renderAlerts(alerts) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (!alerts || alerts.length === 0) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>alertsEl.innerHTML = `&lt;p class="muted"&gt;No safety alerts.&lt;/p&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>alertsEl.innerHTML = alerts.map(alert =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const severityClass =</p>
+<p class="p1"><span class="Apple-converted-space">          </span>alert.severity === "critical" ? "alert-critical"</p>
+<p class="p1"><span class="Apple-converted-space">          </span>: alert.severity === "warning" ? "alert-warning"</p>
+<p class="p1"><span class="Apple-converted-space">          </span>: "alert-info";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>return `</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="alert ${severityClass}"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;p class="alert-message"&gt;${escape(alert.message)}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>${alert.suggested_question ? `&lt;p class="alert-question"&gt;Ask your GP: “${escape(alert.suggested_question)}”&lt;/p&gt;` : ""}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}).join("");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function escape(str) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return String(str)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.replace(/&amp;/g, "&amp;amp;")</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.replace(/&lt;/g, "&amp;lt;")</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.replace(/&gt;/g, "&amp;gt;")</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.replace(/"/g, "&amp;quot;")</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.replace(/'/g, "&amp;#039;");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
