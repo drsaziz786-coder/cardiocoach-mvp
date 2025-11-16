@@ -6,3 +6,4 @@ pytesseract
 pypdf
 reportlab
 pdfminer.six
+openai
