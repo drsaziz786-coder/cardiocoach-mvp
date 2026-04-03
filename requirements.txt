@@ -10,3 +10,4 @@ pdfminer.six
 openai
 jinja2
 python-multipart
+python-dotenv
