@@ -1,13 +1,26 @@
-fastapi
-uvicorn[standard]
-httpx
+# Core web framework — pinned to prevent TemplateResponse API breakage
+fastapi==0.121.2
+starlette==0.49.3
+uvicorn[standard]==0.38.0
+jinja2==3.1.6
+python-multipart==0.0.20
+
+# Data validation
+pydantic==2.12.4
+
+# AI
+openai==2.8.0
+
+# PDF processing
 pillow
 pytesseract
 pypdf
 pdfplumber
 reportlab
 pdfminer.six
-openai
-jinja2
-python-multipart
-python-dotenv
+
+# HTTP client
+httpx
+
+# Utilities
+python-dotenv==1.2.1
