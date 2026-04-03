@@ -312,6 +312,30 @@ def extract_structured(raw_text: str) -> ExtractionResult:
     ]:
         data.setdefault(key, [])
 
+    # Pydantic v2 guard: ensure fields declared as List[str] contain only strings.
+    # The LLM occasionally returns structured objects for procedures/diagnoses when
+    # the investigation cards prompt instructions are present. Flatten any dicts to
+    # their string representation so Pydantic v2 validation does not raise
+    # TypeError: unhashable type: 'dict'.
+    for str_list_key in ("diagnoses", "procedures", "pending_tests", "red_flags"):
+        data[str_list_key] = [
+            item if isinstance(item, str) else (
+                item.get("name") or item.get("type") or item.get("procedure") or str(item)
+            )
+            for item in data[str_list_key]
+        ]
+
+    # Ensure help_seeking is a plain dict before Pydantic constructs HelpSeeking.
+    # If the LLM returned a nested object it may already be a dict; if it returned
+    # null or omitted it, restore the safe default.
+    hs = data.get("help_seeking")
+    if not isinstance(hs, dict):
+        data["help_seeking"] = {"call_999": [], "contact_gp": [], "contact_team": None}
+    else:
+        hs.setdefault("call_999", [])
+        hs.setdefault("contact_gp", [])
+        hs.setdefault("contact_team", None)
+
     for key in [
         "narrative_summary",
         "diagnoses_explanation",
