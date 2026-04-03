@@ -63,6 +63,7 @@ Rules for explanations:
   PARAGRAPH 4 — Follow-up plan: What follow-up appointments, investigations, or procedures are planned, when they are expected, and who the patient should contact if they have not heard. If any mandatory sentences (from combination rules or complex condition rule) apply, append them at the end of whichever paragraph they are most relevant to — do not let them replace the clinical content above.
   FORMATTING: Separate each paragraph with \n\n. The output must contain exactly three \n\n breaks producing four visually distinct paragraphs. Do not run the paragraphs together into a single block of text.
 - Section explanations (diagnoses_explanation, procedures_explanation, etc.): 1-3 sentences covering the group as a whole.
+- procedures_explanation: IMPORTANT — this field must NOT be null or say "none mentioned" simply because no surgical or interventional procedure was performed. If the patient received clinical management during the admission (e.g. IV diuretics, oxygen therapy, fluid balance monitoring, cardiac monitoring, rate control, clinical stabilisation), describe that management in plain English in this field. Only set to null if the letter contains genuinely no information about what was done during the admission. Examples of what to capture: "During your stay, you were given medicines through a drip to help remove fluid from your lungs and legs. Your heart rate and oxygen levels were monitored closely until you were stable enough to go home." or "You were treated with medicines to control your fluid levels and heart rate. You responded well and were discharged once your breathing had improved."
 - Per-item explanations (medication explanation, follow_up explanation): 1-2 sentences each.
 - If the patient has multi-vessel disease, heart failure, or three or more co-morbidities, the narrative_summary MUST include this sentence: "Your heart condition is complex and your doctors have put together a detailed plan. It is important to attend all your follow-up appointments."
 
@@ -252,6 +253,7 @@ SELF-CHECK — before finalising your JSON output, verify all 10 of the followin
 8. If a loop diuretic is present in a heart failure patient — the daily weight monitoring instruction is in the diuretic explanation.
 9. If an incidental finding is mentioned in imaging with no documented follow-up — it appears in pending_tests and narrative_summary.
 10. help_seeking.call_999 contains at least the three standard cardiac 999 triggers.
+11. procedures_explanation is NOT null and does NOT say "none mentioned" unless the letter contains genuinely no information about what was done during the admission — if any clinical management is documented (IV treatment, monitoring, fluid balance, stabilisation), it must be described here in plain English.
 """
 
 
