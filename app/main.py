@@ -4,12 +4,11 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from typing import List, Optional
-from io import BytesIO
-from pypdf import PdfReader
 
 from app.schemas import ExtractionResult, RuleAlert
 from app.services.extractor import extract_structured
 from app.services.rules_engine import run_rules
+from app.services.deid import deidentify_pdf, DeidentificationError
 
 
 app = FastAPI(
@@ -70,7 +69,7 @@ async def process_discharge_letter(payload: ProcessRequest):
     return ProcessResponse(
         extraction=extraction,
         alerts=alerts,
-        explanation=None,
+        explanation=extraction.narrative_summary,
         gp_questions=None,
     )
 
@@ -78,41 +77,26 @@ async def process_discharge_letter(payload: ProcessRequest):
 @app.post("/process-pdf", response_model=ProcessResponse)
 async def process_discharge_pdf(file: UploadFile = File(...)):
     """
-    Accept a PDF discharge letter, extract text, then run
+    Accept a PDF discharge letter, de-identify it, then run
     the same extraction + rules pipeline as /process.
     """
-    if file.content_type != "application/pdf":
-        # Many browsers send application/octet-stream, so we just warn.
-        print(f"Warning: uploaded file content_type={file.content_type}")
-
-    # Read the file bytes into memory
     raw_bytes = await file.read()
 
     try:
-        pdf_reader = PdfReader(BytesIO(raw_bytes))
-        pages_text: List[str] = []
-        for page in pdf_reader.pages:
-            text = page.extract_text() or ""
-            pages_text.append(text)
-        full_text = "\n\n".join(pages_text).strip()
+        clean_text = deidentify_pdf(raw_bytes)
+    except DeidentificationError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Failed to read PDF: {e}",
-        )
+        raise HTTPException(status_code=400, detail=f"Failed to read PDF: {e}")
 
-    if not full_text:
-        raise HTTPException(
-            status_code=400,
-            detail="No readable text found in PDF (may be scanned / image-only).",
-        )
-
-    extraction = extract_structured(full_text)
+    extraction = extract_structured(clean_text)
     alerts = run_rules(extraction)
 
     return ProcessResponse(
         extraction=extraction,
         alerts=alerts,
-        explanation=None,
+        explanation=extraction.narrative_summary,
         gp_questions=None,
     )

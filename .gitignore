@@ -8,3 +8,9 @@ __pycache__/
 # macOS junk
 .DS_Store
 venv
+
+# Secrets
+.env
+
+# Test and output PDFs
+*.pdf

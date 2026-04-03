@@ -23,39 +23,46 @@
           You can remove your name or personal details if you prefer.
           CardioCoach does not store any uploaded text.
         </p>
-<form id="discharge-form">
-  <textarea id="discharge-text" class="textarea" rows="10"
-    placeholder="Paste your discharge letter here..."></textarea>
+        <form id="discharge-form">
+          <textarea id="discharge-text" class="textarea" rows="10"
+            placeholder="Paste your discharge letter here..."></textarea>
 
-  <div class="upload-row">
-    <label for="pdf-input" class="upload-label">
-      Or upload your discharge letter as a PDF:
-    </label>
-    <input type="file" id="pdf-input" accept="application/pdf" />
-  </div>
+          <div class="upload-row">
+            <label for="pdf-input" class="upload-label">
+              Or upload your discharge letter as a PDF:
+            </label>
+            <input type="file" id="pdf-input" accept="application/pdf" />
+          </div>
 
-  <div class="button-row">
-    <button type="submit" class="btn-primary" id="submit-btn">
-      Explain pasted text
-    </button>
-    <button type="button" class="btn-secondary" id="pdf-btn">
-      Explain PDF discharge letter
-    </button>
-  </div>
+          <div class="button-row">
+            <button type="submit" class="btn-primary" id="submit-btn">
+              Explain pasted text
+            </button>
+            <button type="button" class="btn-secondary" id="pdf-btn">
+              Explain PDF discharge letter
+            </button>
+          </div>
 
-  <p id="status" class="status"></p>
-</form>      </section>
+          <p id="status" class="status"></p>
+        </form>
+      </section>
 
-      <section class="results-grid">
+      <!-- Plain-English narrative — hidden until results load -->
+      <section class="card" id="narrative-card" style="display:none;">
+        <h2 class="card-title">What your discharge letter means</h2>
+        <div id="narrative-content" class="narrative-text"></div>
+      </section>
+
+      <section class="results-grid" id="results-grid" style="display:none;">
         <div class="card" id="summary-card">
-          <h2 class="card-title">2. Key information from your letter</h2>
+          <h2 class="card-title">Supporting detail from your letter</h2>
           <div id="extraction">
             <p class="muted">Your summary will appear here.</p>
           </div>
         </div>
 
         <div class="card">
-          <h2 class="card-title">3. Safety checks</h2>
+          <h2 class="card-title">Safety checks</h2>
           <p class="card-help">
             Automated checks for medication issues or missing follow-up.
           </p>
@@ -75,13 +82,19 @@
   </div>
 
   <script>
-    const form = document.getElementById("discharge-form");
-    const textarea = document.getElementById("discharge-text");
-    const statusEl = document.getElementById("status");
-    const extractionEl = document.getElementById("extraction");
-    const alertsEl = document.getElementById("alerts");
-    const submitBtn = document.getElementById("submit-btn");
+    const form          = document.getElementById("discharge-form");
+    const textarea      = document.getElementById("discharge-text");
+    const statusEl      = document.getElementById("status");
+    const extractionEl  = document.getElementById("extraction");
+    const alertsEl      = document.getElementById("alerts");
+    const submitBtn     = document.getElementById("submit-btn");
+    const pdfBtn        = document.getElementById("pdf-btn");
+    const pdfInput      = document.getElementById("pdf-input");
+    const narrativeCard = document.getElementById("narrative-card");
+    const narrativeContent = document.getElementById("narrative-content");
+    const resultsGrid   = document.getElementById("results-grid");
 
+    // ── Text submit ──────────────────────────────────────────────────────────
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       const text = textarea.value.trim();
@@ -91,25 +104,19 @@
         return;
       }
 
-      statusEl.textContent = "Processing your letter…";
-      statusEl.className = "status status-info";
-      submitBtn.disabled = true;
+      setLoading(submitBtn, "Processing your letter…");
 
       try {
         const response = await fetch("/process", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-          },
+          headers: { "Content-Type": "application/json", "Accept": "application/json" },
           body: JSON.stringify({ text }),
         });
 
         if (!response.ok) throw new Error("Server error " + response.status);
 
         const data = await response.json();
-        renderExtraction(data.extraction);
-        renderAlerts(data.alerts);
+        renderAll(data);
 
         statusEl.textContent = "Done.";
         statusEl.className = "status status-success";
@@ -118,87 +125,283 @@
         statusEl.textContent = "Something went wrong. Try again.";
         statusEl.className = "status status-error";
       } finally {
-        submitBtn.disabled = false;
+        clearLoading(submitBtn, "Explain pasted text");
       }
     });
 
-    function renderExtraction(extraction) {
-      extractionEl.innerHTML = `
-        ${renderList("Diagnoses", extraction.diagnoses)}
-        ${renderList("Procedures", extraction.procedures)}
-        ${renderMedChanges(extraction.medication_changes)}
-        ${renderFollowUp(extraction.follow_up)}
-        ${renderList("Pending tests", extraction.pending_tests)}
-        ${renderList("Safety advice in the letter", extraction.red_flags)}
-      `;
+    // ── PDF submit ───────────────────────────────────────────────────────────
+    pdfBtn.addEventListener("click", async () => {
+      const file = pdfInput.files[0];
+      if (!file) {
+        statusEl.textContent = "Please select a PDF file first.";
+        statusEl.className = "status status-error";
+        return;
+      }
+
+      setLoading(pdfBtn, "Uploading and processing PDF…");
+
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        // Do NOT set Content-Type — browser sets multipart boundary automatically
+        const response = await fetch("/process-pdf", { method: "POST", body: formData });
+
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({}));
+          throw new Error(err.detail || "Server error " + response.status);
+        }
+
+        const data = await response.json();
+        renderAll(data);
+
+        statusEl.textContent = "Done.";
+        statusEl.className = "status status-success";
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = "Error: " + err.message;
+        statusEl.className = "status status-error";
+      } finally {
+        clearLoading(pdfBtn, "Explain PDF discharge letter");
+      }
+    });
+
+    // ── Orchestration ────────────────────────────────────────────────────────
+    function setLoading(btn, message) {
+      btn.disabled = true;
+      statusEl.textContent = message;
+      statusEl.className = "status status-info";
     }
 
-    function renderList(title, items) {
-      if (!items || items.length === 0) {
-        return `<div class="result-block">
-          <h3>${title}</h3>
-          <p class="muted">None mentioned.</p>
-        </div>`;
+    function clearLoading(btn, label) {
+      btn.disabled = false;
+      btn.textContent = label;
+    }
+
+    function renderAll(data) {
+      renderNarrativeSummary(data.extraction);
+      renderExtraction(data.extraction);
+      renderAlerts(data.alerts);
+      resultsGrid.style.display = "";
+    }
+
+    // ── Narrative summary ────────────────────────────────────────────────────
+    function renderNarrativeSummary(extraction) {
+      if (extraction.narrative_summary) {
+        const paragraphs = extraction.narrative_summary
+          .split(/\n+/)
+          .filter(p => p.trim().length > 0)
+          .map(p => `<p>${escapeHtml(p.trim())}</p>`)
+          .join("");
+        narrativeContent.innerHTML = paragraphs;
+        narrativeCard.style.display = "";
+      } else {
+        narrativeCard.style.display = "none";
       }
+    }
+
+    // ── Extraction sections ──────────────────────────────────────────────────
+    function renderExtraction(extraction) {
+      extractionEl.innerHTML = [
+        renderDiagnosesSection(extraction),
+        renderProceduresSection(extraction),
+        renderImagingResults(extraction),
+        renderMedChanges(extraction.medication_changes),
+        renderFollowUp(extraction.follow_up),
+        renderPendingTestsSection(extraction),
+        renderRedFlagsSection(extraction),
+        renderHelpSeeking(extraction),
+      ].join("");
+    }
+
+    function renderDiagnosesSection(extraction) {
+      const list = simpleList("What you were diagnosed with", extraction.diagnoses);
+      const exp  = explanationBlock(extraction.diagnoses_explanation);
+      return `<div class="result-block">${list}${exp}</div>`;
+    }
+
+    function renderProceduresSection(extraction) {
+      const list = simpleList("What was done during your stay", extraction.procedures);
+      const exp  = explanationBlock(extraction.procedures_explanation);
+      return `<div class="result-block">${list}${exp}</div>`;
+    }
+
+    function renderPendingTestsSection(extraction) {
+      const list = simpleList("Tests still to come", extraction.pending_tests);
+      const exp  = explanationBlock(extraction.pending_tests_explanation);
+      return `<div class="result-block">${list}${exp}</div>`;
+    }
+
+    function renderRedFlagsSection(extraction) {
+      const list = simpleList("Warning signs — when to seek urgent help", extraction.red_flags);
+      const exp  = extraction.red_flags_explanation
+        ? `<p class="section-explanation red-flags-text">${escapeHtml(extraction.red_flags_explanation)}</p>`
+        : "";
+      return `<div class="result-block">${list}${exp}</div>`;
+    }
+
+    // ── Imaging results ──────────────────────────────────────────────────────
+    function renderImagingResults(extraction) {
+      const results = extraction.imaging_results;
+      if (!results || results.length === 0) return "";
+
+      const items = results.map(img => {
+        const findings = img.findings && img.findings.length > 0
+          ? `<ul class="pill-list">${img.findings.map(f => `<li>${escapeHtml(f)}</li>`).join("")}</ul>`
+          : "";
+        const exp = img.explanation
+          ? `<p class="section-explanation">${escapeHtml(img.explanation)}</p>`
+          : "";
+        return `<div class="imaging-item"><h4>${escapeHtml(img.type)}</h4>${findings}${exp}</div>`;
+      }).join("");
+
+      const groupExp = extraction.imaging_results_explanation
+        ? `<p class="section-explanation">${escapeHtml(extraction.imaging_results_explanation)}</p>`
+        : "";
+
       return `<div class="result-block">
-        <h3>${title}</h3>
-        <ul class="pill-list">
-          ${items.map(i => `<li>${escapeHtml(i)}</li>`).join("")}
-        </ul>
+        <h3>Scan results</h3>
+        ${items}
+        ${groupExp}
       </div>`;
     }
 
+    // ── Medication changes ───────────────────────────────────────────────────
     function renderMedChanges(changes) {
       if (!changes || changes.length === 0) {
         return `<div class="result-block">
-          <h3>Medication changes</h3>
-          <p class="muted">None identified.</p>
+          <h3>Your medicines</h3>
+          <p class="muted">No medication changes identified.</p>
         </div>`;
       }
+
+      const actionLabels = {
+        start:    "New medicine",
+        stop:     "Stopped",
+        increase: "Dose increased",
+        decrease: "Dose reduced",
+        continue: "Continuing"
+      };
+
+      const items = changes.map(m => {
+        const label    = actionLabels[m.action] || m.action;
+        const hasPanel = m.explanation || m.reason_for_change || m.side_effects || m.importance;
+        const panel    = hasPanel ? `
+          <div class="med-explanation-panel">
+            ${m.explanation       ? `<p><strong>What it does:</strong> ${escapeHtml(m.explanation)}</p>` : ""}
+            ${m.reason_for_change ? `<p><strong>Why it changed:</strong> ${escapeHtml(m.reason_for_change)}</p>` : ""}
+            ${m.side_effects      ? `<p><strong>Side effects to watch for:</strong> ${escapeHtml(m.side_effects)}</p>` : ""}
+            ${m.importance        ? `<p><strong>Why it matters:</strong> ${escapeHtml(m.importance)}</p>` : ""}
+          </div>` : "";
+
+        return `<li class="med-item">
+          <div class="med-header">
+            <span class="action-badge action-${escapeHtml(m.action)}">${escapeHtml(label)}</span>
+            <strong>${escapeHtml(m.name)}</strong>
+            ${m.dose ? `<span class="dose-label">${escapeHtml(m.dose)}</span>` : ""}
+          </div>
+          ${panel}
+        </li>`;
+      }).join("");
+
       return `<div class="result-block">
-        <h3>Medication changes</h3>
-        <ul class="bullet-list">
-          ${changes.map(m => `
-            <li><strong>${escapeHtml(m.action.toUpperCase())}</strong> — 
-              ${escapeHtml(m.name)} ${m.dose ? "(" + escapeHtml(m.dose) + ")" : ""}</li>
-          `).join("")}
-        </ul>
+        <h3>Your medicines</h3>
+        <ul class="med-list">${items}</ul>
       </div>`;
     }
 
+    // ── Follow-up ────────────────────────────────────────────────────────────
     function renderFollowUp(fu) {
       if (!fu || fu.length === 0) {
         return `<div class="result-block">
-          <h3>Follow-up</h3>
+          <h3>Follow-up appointments</h3>
           <p class="muted">No follow-up plan found.</p>
         </div>`;
       }
+
+      const items = fu.map(f => `
+        <li class="fu-item">
+          <div class="fu-header">
+            <strong>${escapeHtml(f.type)}</strong> — ${escapeHtml(f.when)}
+            ${f.location ? `<span class="fu-location">(${escapeHtml(f.location)})</span>` : ""}
+          </div>
+          ${f.explanation ? `<p class="fu-explanation">${escapeHtml(f.explanation)}</p>` : ""}
+        </li>`).join("");
+
       return `<div class="result-block">
-        <h3>Follow-up</h3>
-        <ul class="bullet-list">
-          ${fu.map(f => `
-            <li>${escapeHtml(f.type)} — ${escapeHtml(f.when)}
-              ${f.location ? "(" + escapeHtml(f.location) + ")" : ""}</li>
-          `).join("")}
-        </ul>
+        <h3>Follow-up appointments</h3>
+        <ul class="fu-list">${items}</ul>
       </div>`;
     }
 
+    // ── Help-seeking ladder ──────────────────────────────────────────────────
+    function renderHelpSeeking(extraction) {
+      const hs = extraction.help_seeking;
+      if (!hs) return "";
+
+      const has999 = hs.call_999 && hs.call_999.length > 0;
+      const hasGP  = hs.contact_gp && hs.contact_gp.length > 0;
+      if (!has999 && !hasGP && !hs.contact_team) return "";
+
+      const tier999 = has999 ? `
+        <div class="help-tier help-tier-999">
+          <div class="help-tier-label">Call 999 immediately if you have:</div>
+          <ul>${hs.call_999.map(s => `<li>${escapeHtml(s)}</li>`).join("")}</ul>
+        </div>` : "";
+
+      const tierGP = hasGP ? `
+        <div class="help-tier help-tier-gp">
+          <div class="help-tier-label">Contact your GP within a few days if you have:</div>
+          <ul>${hs.contact_gp.map(s => `<li>${escapeHtml(s)}</li>`).join("")}</ul>
+        </div>` : "";
+
+      const tierTeam = hs.contact_team ? `
+        <div class="help-tier help-tier-team">
+          <strong>Your named contact:</strong> ${escapeHtml(hs.contact_team)}
+        </div>` : "";
+
+      return `<div class="result-block">
+        <h3>What to do if you are worried</h3>
+        <div class="help-seeking-block">
+          ${tier999}${tierGP}${tierTeam}
+        </div>
+      </div>`;
+    }
+
+    // ── Safety alerts ────────────────────────────────────────────────────────
     function renderAlerts(alerts) {
       if (!alerts || alerts.length === 0) {
         alertsEl.innerHTML = `<p class="muted">No safety alerts.</p>`;
         return;
       }
       alertsEl.innerHTML = alerts.map(alert => {
-        const severityClass =
+        const cls =
           alert.severity === "critical" ? "alert-critical" :
-          alert.severity === "warning" ? "alert-warning" : "alert-info";
-        return `<div class="alert ${severityClass}">
+          alert.severity === "warning"  ? "alert-warning"  : "alert-info";
+        return `<div class="alert ${cls}">
           <p class="alert-message">${escapeHtml(alert.message)}</p>
-          ${alert.suggested_question ?
-            `<p class="alert-question">Ask your GP: “${escapeHtml(alert.suggested_question)}”</p>` : ""}
+          ${alert.suggested_question
+            ? `<p class="alert-question">Check with your cardiac team: "${escapeHtml(alert.suggested_question)}"</p>`
+            : ""}
         </div>`;
       }).join("");
+    }
+
+    // ── Shared helpers ───────────────────────────────────────────────────────
+    function simpleList(title, items) {
+      if (!items || items.length === 0) {
+        return `<h3>${escapeHtml(title)}</h3><p class="muted">None mentioned.</p>`;
+      }
+      return `<h3>${escapeHtml(title)}</h3>
+        <ul class="pill-list">
+          ${items.map(i => `<li>${escapeHtml(i)}</li>`).join("")}
+        </ul>`;
+    }
+
+    function explanationBlock(text) {
+      return text
+        ? `<p class="section-explanation">${escapeHtml(text)}</p>`
+        : "";
     }
 
     function escapeHtml(str) {

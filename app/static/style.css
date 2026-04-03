@@ -244,3 +244,222 @@ body {
   font-size: 0.8rem;
   text-align: left;
 }
+
+/* ── Narrative summary ─────────────────────────────────────────── */
+.narrative-text p {
+  color: var(--text-main);
+  line-height: 1.75;
+  margin-bottom: 0.9rem;
+  font-size: 1rem;
+}
+
+.narrative-text p:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Section-level explanation callout ─────────────────────────── */
+.section-explanation {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0.5rem 0 0;
+  padding: 0.6rem 0.85rem;
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+  border-radius: 0 8px 8px 0;
+}
+
+.red-flags-text {
+  border-left-color: var(--danger);
+  background: var(--danger-soft);
+}
+
+/* ── Medicine list ──────────────────────────────────────────────── */
+.med-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.med-item {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.med-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.med-header {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.45rem;
+}
+
+.action-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.action-start    { background: rgba(34, 197, 94, 0.18);  color: #4ade80; }
+.action-stop     { background: var(--danger-soft);        color: var(--danger); }
+.action-increase { background: var(--info-soft);          color: var(--info); }
+.action-decrease { background: var(--warning-soft);       color: var(--warning); }
+.action-continue { background: rgba(255, 255, 255, 0.07); color: var(--text-muted); }
+
+.dose-label {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.med-explanation-panel {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 10px;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.87rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.med-explanation-panel p {
+  margin: 0.25rem 0;
+}
+
+.med-explanation-panel p:first-child {
+  margin-top: 0;
+}
+
+.med-explanation-panel p:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Follow-up list ─────────────────────────────────────────────── */
+.fu-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.fu-item {
+  margin-bottom: 0.85rem;
+}
+
+.fu-item:last-child {
+  margin-bottom: 0;
+}
+
+.fu-header {
+  font-size: 0.92rem;
+}
+
+.fu-location {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-left: 0.3rem;
+}
+
+.fu-explanation {
+  margin: 0.25rem 0 0;
+  font-size: 0.86rem;
+  color: var(--text-muted);
+  padding-left: 0.65rem;
+  border-left: 2px solid var(--border-subtle);
+  line-height: 1.5;
+}
+
+/* ── PDF / secondary button ─────────────────────────────────────── */
+.btn-secondary {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 999px;
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  color: var(--text-main);
+  transition: all 0.15s ease;
+  margin-top: 0.5rem;
+}
+
+.btn-secondary:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* ── Help-seeking ladder ────────────────────────────────────────── */
+.help-seeking-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.help-tier {
+  border-radius: 10px;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.88rem;
+}
+
+.help-tier-label {
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.35rem;
+}
+
+.help-tier ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.help-tier ul li {
+  position: relative;
+  padding-left: 1rem;
+  margin-bottom: 0.2rem;
+  line-height: 1.45;
+  color: var(--text-main);
+}
+
+.help-tier ul li::before {
+  content: "•";
+  position: absolute;
+  left: 0.2rem;
+}
+
+.help-tier-999 {
+  background: var(--danger-soft);
+  border: 1px solid var(--danger);
+}
+.help-tier-999 .help-tier-label { color: var(--danger); }
+.help-tier-999 ul li::before   { color: var(--danger); }
+
+.help-tier-gp {
+  background: var(--accent-soft);
+  border: 1px solid rgba(34, 197, 94, 0.35);
+}
+.help-tier-gp .help-tier-label { color: var(--accent); }
+.help-tier-gp ul li::before    { color: var(--accent); }
+
+.help-tier-team {
+  background: var(--info-soft);
+  border: 1px solid var(--info);
+  font-size: 0.87rem;
+  color: var(--info);
+}
